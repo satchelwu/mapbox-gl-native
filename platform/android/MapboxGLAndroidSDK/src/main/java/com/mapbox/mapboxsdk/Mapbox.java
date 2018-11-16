@@ -70,7 +70,7 @@ public final class Mapbox {
   }
 
   /**
-   * Access token for this application.
+   * Get the current active access token for this application.
    *
    * @return Mapbox access token
    */
@@ -78,6 +78,15 @@ public final class Mapbox {
   public static String getAccessToken() {
     validateMapbox();
     return INSTANCE.accessToken;
+  }
+
+  /**
+   * Set the current active accessToken.
+   */
+  public static void setAccessToken(String accessToken) {
+    validateMapbox();
+    INSTANCE.accessToken = accessToken;
+    FileSource.getInstance(getApplicationContext()).setAccessToken(accessToken);
   }
 
   /**
