@@ -116,7 +116,7 @@
 
 - (void)setCenter:(CGPoint)center
 {
-    MGLLogDebug(@"Setting center: %@", NSStringFromCGPoint(center));
+    //MGLLogDebug(@"Setting center: %@", NSStringFromCGPoint(center));
     center.x += _centerOffset.dx;
     center.y += _centerOffset.dy;
 
