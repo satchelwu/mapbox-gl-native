@@ -686,7 +686,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
             switch (indexPath.row)
             {
                 case MBXSettingsMiscellaneousLocalizeLabels:
-                    [self styleCountryLabelsLanguage];
+                    [self toggleStyleLabelsLanguage];
                     break;
                 case MBXSettingsMiscellaneousWorldTour:
                     [self startWorldTour];
@@ -1432,10 +1432,10 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     }
 }
 
--(void)styleCountryLabelsLanguage
+-(void)toggleStyleLabelsLanguage
 {
     _localizingLabels = !_localizingLabels;
-    [self.mapView.style localizeLabelsIntoLocale:_localizingLabels ? [NSLocale localeWithLocaleIdentifier:@"mul"] : nil];
+    [self.mapView.style localizeLabelsIntoLocale:_localizingLabels ? [NSLocale localeWithLocaleIdentifier:@"mul"] : [NSLocale localeWithLocaleIdentifier:@"ja-JP"]/*nil*/];
 }
 
 - (void)styleRouteLine
@@ -1539,7 +1539,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 - (NSString *)bestLanguageForUser
 {
     // https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview
-    NSArray *supportedLanguages = @[ @"ar", @"en", @"es", @"fr", @"de", @"pt", @"ru", @"zh", @"zh-Hans" ];
+    NSArray *supportedLanguages = @[ @"ar", @"en", @"es", @"fr", @"de", @"pt", @"ru", @"ja", @"ko", @"zh", @"zh-Hans" ];
     NSArray<NSString *> *preferredLanguages = [NSBundle preferredLocalizationsFromArray:supportedLanguages forPreferences:[NSLocale preferredLanguages]];
     NSString *mostSpecificLanguage;
 
@@ -1906,41 +1906,42 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         styleNames = @[
+            @"Streets v11",
             @"Streets",
-            @"Outdoors",
-            @"Light",
-            @"Dark",
-            @"Satellite",
-            @"Satellite Streets",
+//            @"Outdoors",
+//            @"Light",
+//            @"Dark",
+//            @"Satellite",
+//            @"Satellite Streets",
         ];
         styleURLs = @[
+            [NSURL URLWithString:@"mapbox://styles/mapbox-cartography/cjgfbvou8001g2snq4ul5rmt7"],
             [MGLStyle streetsStyleURL],
-            [MGLStyle outdoorsStyleURL],
-            [MGLStyle lightStyleURL],
-            [MGLStyle darkStyleURL],
-            [MGLStyle satelliteStyleURL],
-            [MGLStyle satelliteStreetsStyleURL]
-            
+//            [MGLStyle outdoorsStyleURL],
+//            [MGLStyle lightStyleURL],
+//            [MGLStyle darkStyleURL],
+//            [MGLStyle satelliteStyleURL],
+//            [MGLStyle satelliteStreetsStyleURL]
         ];
-        NSAssert(styleNames.count == styleURLs.count, @"Style names and URLs don’t match.");
-
-        // Make sure defaultStyleURLs is up-to-date.
-        unsigned numMethods = 0;
-        Method *methods = class_copyMethodList(object_getClass([MGLStyle class]), &numMethods);
-        unsigned numStyleURLMethods = 0;
-        for (NSUInteger i = 0; i < numMethods; i++) {
-            Method method = methods[i];
-            if (method_getNumberOfArguments(method) == 3 /* _cmd, self, version */) {
-                SEL selector = method_getName(method);
-                NSString *name = @(sel_getName(selector));
-                if ([name hasSuffix:@"StyleURLWithVersion:"]) {
-                    numStyleURLMethods += 1;
-                }
-            }
-        }
-        NSAssert(numStyleURLMethods == styleNames.count,
-                 @"MGLStyle provides %u default styles but iosapp only knows about %lu of them.",
-                 numStyleURLMethods, (unsigned long)styleNames.count);
+//        NSAssert(styleNames.count == styleURLs.count, @"Style names and URLs don’t match.");
+//
+//        // Make sure defaultStyleURLs is up-to-date.
+//        unsigned numMethods = 0;
+//        Method *methods = class_copyMethodList(object_getClass([MGLStyle class]), &numMethods);
+//        unsigned numStyleURLMethods = 0;
+//        for (NSUInteger i = 0; i < numMethods; i++) {
+//            Method method = methods[i];
+//            if (method_getNumberOfArguments(method) == 3 /* _cmd, self, version */) {
+//                SEL selector = method_getName(method);
+//                NSString *name = @(sel_getName(selector));
+//                if ([name hasSuffix:@"StyleURLWithVersion:"]) {
+//                    numStyleURLMethods += 1;
+//                }
+//            }
+//        }
+//        NSAssert(numStyleURLMethods == styleNames.count,
+//                 @"MGLStyle provides %u default styles but iosapp only knows about %lu of them.",
+//                 numStyleURLMethods, (unsigned long)styleNames.count);
     });
 
     self.styleIndex = (self.styleIndex + 1) % styleNames.count;
@@ -2184,7 +2185,11 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     // Default Mapbox styles use {name_en} as their label language, which means
     // that a device with an English-language locale is already effectively
     // using locale-based country labels.
-    _localizingLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
+//    _localizingLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
+//    if (![[self bestLanguageForUser] isEqualToString:@"en"]) {
+//        [self toggleStyleLabelsLanguage];
+//    }
+    [self.mapView.style localizeLabelsIntoLocale:nil];
 }
 
 - (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera {
