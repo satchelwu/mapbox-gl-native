@@ -1039,6 +1039,25 @@ using namespace std::string_literals;
 
 #pragma mark - Localization tests
 
+- (void)testv11Localization {
+    {
+        NSExpression *original = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K})", @"name_en", @"name"];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce:({name_en, name})"];
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:nil], expected);
+    }
+    {
+        NSArray *jsonExpression = @[@"mgl_coalesce", @[@"get", @"name_en"], @[@"get", @"name"]];
+        NSExpression *original = [NSExpression expressionWithMGLJSONObject:jsonExpression];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"MGL_FUNCTION(mgl_coalesce:({name_en, name}))"];
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:nil], expected);
+    }
+    {
+        NSExpression *original = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K})", @"name_en", @"name"];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce:({name_ja, name})"];
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"ja-JP"]], expected);
+    }
+}
+
 - (void)testLocalization {
     {
         NSExpression *original = MGLConstantExpression(@"");
@@ -1072,8 +1091,7 @@ using namespace std::string_literals;
     }
     {
         NSExpression *original = [NSExpression expressionForKeyPath:@"name_en"];
-        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K, %K, %K})",
-                                  @"name_zh-Hans", @"name_zh-CN", @"name_zh", @"name"];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_coalesce({%K, %K, %K, %K})", @"name_zh-Hans", @"name_zh-CN", @"name_zh", @"name"];
         XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"zh-Hans"]], expected);
     }
     {
